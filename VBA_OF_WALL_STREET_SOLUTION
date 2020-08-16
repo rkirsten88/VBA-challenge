@@ -1,0 +1,120 @@
+Sub VBA_Homework_Solution_RK()
+'NOTE: TUTOR ADDED MESSAGE BOXES DO DEBUG. I CHOSE NOT TO REMOVE. :)
+'Assign variable to worksheet and activate
+    Dim WS As Worksheet
+    For Each WS In ActiveWorkbook.Worksheets
+    WS.Activate
+    'boilerplate code for determining last row with ws assigned
+    'Dim Lastrow As Double
+    Lastrow = WS.Cells(Rows.Count, 1).End(xlUp).Row
+    'Set Column as integer to reference starting point and outside of the loop
+    Dim Column As Integer
+    Column = 1
+    'Create summary table
+    'Insert labels for summary table
+    'Cells(1, Column + 8).Value = "Ticker Symbol"
+    Cells(1, Column + 9).Value = "Yearly Change"
+    Cells(1, Column + 10).Value = "Percent Change"
+    Cells(1, Column + 11).Value = "Total Stock Volume"
+    Cells(2, Column + 14).Value = "Greatest % Increase"
+    Cells(3, Column + 14).Value = "Greatest % Decrease"
+    Cells(4, Column + 14).Value = "Greatest Total Volume"
+    Cells(1, Column + 15).Value = "Ticker"
+    Cells(1, Column + 16).Value = "Value"
+    'Bold the lables & Make them all fit
+    WS.Range("I1:Q1").Font.Bold = True
+    WS.Range("I:Q").Columns.AutoFit
+    'Keep track of location for each symbol in summary table
+    Dim Summary_Table_Row As Integer
+    Summary_Table_Row = 2
+    'Set initial variable for holding ticker symbol
+    Dim Ticker_Symbol As String
+    'Set initial variable for holding total stock volume and set to zero
+    Dim stock_volume As Double
+    stock_volume = 0
+    'Set variables for open value and close value
+    Dim Open_Price As Double
+    Dim Close_Price As Double
+    Dim i As Double
+    'Set variable for yearly change
+    Dim Yearly_Change As Double
+    'Set initial variable for holding percent change
+    Dim Percent_Change As Double
+    'Set previous amount
+    'Dim PreviousAmount As Long
+    'PreviousAmount = 2
+    Dim New_variable As Double
+    New_variable = 2
+    For i = 2 To Lastrow
+    'check if cells are all same ticker, if not...
+    If WS.Cells(i + 1, 1).Value <> WS.Cells(i, 1).Value Then
+        'determine symbol
+        Ticker_Symbol = Cells(i, Column).Value
+        'print symbol in summary table
+        WS.Range("I" & 1).Value = "Ticker Name"
+        WS.Range("I" & Summary_Table_Row).Value = Ticker_Symbol
+        'Yearly change
+        'check open price if zero
+        If WS.Cells(New_variable, 3) = 0 Then
+           For find_value = New_variable To i
+              If WS.Cells(find_value, 3).Value <> 0 Then
+                 New_variable = find_value
+                   Exit For
+              End If
+            Next find_value
+        End If
+        Open_Price = WS.Cells(New_variable, 3).Value
+        Yearly_Change = WS.Cells(i, 6).Value - WS.Cells(New_variable, 3).Value
+        If Yearly_Change <> 0 Then
+            Percent_Change = Yearly_Change / Open_Price
+        Else
+            Percent_Change = 0
+        End If
+        New_variable = i + 1
+        'Print yearly change
+        WS.Range("J" & Summary_Table_Row).Value = Yearly_Change
+            If Yearly_Change > 0 Then
+            WS.Range("J" & Summary_Table_Row).Interior.Color = vbGreen
+            Else
+            WS.Range("J" & Summary_Table_Row).Interior.Color = vbRed
+            End If
+        'Percent change statement
+        'If open_price = 0 Then
+        'percent_change = 0
+        'Set open price and percent change
+        'Print percent change in summary table
+        'Format percent change
+        WS.Range("K" & Summary_Table_Row).NumberFormat = "0.00%"
+        WS.Range("K" & Summary_Table_Row).Value = Percent_Change
+        'Add to stock total volume
+        stock_volume = stock_volume + WS.Cells(i, 7).Value
+        'print stock volume in summary table
+        WS.Range("L" & Summary_Table_Row).Value = stock_volume
+        'Add one to the summary table row
+        Summary_Table_Row = Summary_Table_Row + 1
+        Yearly_Change = 0
+        stock_volume = 0
+    End If
+Next i
+'determine Summary last row
+summarylastrow = WS.Cells(Rows.Count, 9).End(xlUp).Row
+For i = 2 To summarylastrow
+    If Cells(i, Column + 10).Value = Application.WorksheetFunction.Max(WS.Range("K2:K" & summarylastrow)) Then
+        Cells(2, Column + 15).Value = Cells(i, Column + 8).Value
+        Cells(2, Column + 16).Value = Cells(i, Column + 10).Value
+        Cells(2, Column + 16).NumberFormat = "0.00%"
+    ElseIf Cells(i, Column + 10).Value = Application.WorksheetFunction.Min(WS.Range("K2:K" & summarylastrow)) Then
+        Cells(3, Column + 15).Value = Cells(i, Column + 8).Value
+        Cells(3, Column + 16).Value = Cells(i, Column + 10).Value
+        Cells(3, Column + 16).NumberFormat = "0.00%"
+    ElseIf Cells(i, Column + 11).Value = Application.WorksheetFunction.Max(WS.Range("L2:L" & summarylastrow)) Then
+        Cells(4, Column + 15).Value = Cells(i, Column + 8).Value
+        Cells(4, Column + 16).Value = Cells(i, Column + 11).Value
+    WS.Range("I:Q").Columns.AutoFit
+    End If
+Next i
+    MsgBox ("complete")
+    Next WS
+End Sub
+
+
