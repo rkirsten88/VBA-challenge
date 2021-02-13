@@ -1,2 +1,2 @@
 # VBA-challenge
-Homework - Rutgers Boot Camp
+Homework 2 - Rutgers Boot Camp
